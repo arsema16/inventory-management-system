@@ -138,8 +138,8 @@ export class AuthService {
   }
 
   private static generateToken(id: string, email: string, role: UserRole): string {
-    return jwt.sign({ id, email, role }, process.env.JWT_SECRET!, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-    });
+    return jwt.sign({ id, email, role }, process.env.JWT_SECRET as string, {
+      expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string,
+    } as jwt.SignOptions);
   }
 }

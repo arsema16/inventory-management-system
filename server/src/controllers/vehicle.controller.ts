@@ -18,7 +18,7 @@ export class VehicleController {
   });
 
   static getVehicleById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const vehicle = await VehicleService.getVehicleById(req.params.id);
+    const vehicle = await VehicleService.getVehicleById(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -37,7 +37,7 @@ export class VehicleController {
   });
 
   static updateVehicle = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const vehicle = await VehicleService.updateVehicle(req.params.id, req.body);
+    const vehicle = await VehicleService.updateVehicle(String(req.params["id"]), req.body);
 
     res.status(200).json({
       success: true,
@@ -47,7 +47,7 @@ export class VehicleController {
   });
 
   static deleteVehicle = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await VehicleService.deleteVehicle(req.params.id);
+    const result = await VehicleService.deleteVehicle(String(req.params["id"]));
 
     res.status(200).json({
       success: true,

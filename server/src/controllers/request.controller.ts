@@ -19,7 +19,7 @@ export class RequestController {
   });
 
   static getRequestById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.getRequestById(req.params.id);
+    const request = await RequestService.getRequestById(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -38,7 +38,7 @@ export class RequestController {
   });
 
   static approveRequest = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.approveRequest(req.params.id, req.user!.id, req.body.comments);
+    const request = await RequestService.approveRequest(String(req.params["id"]), req.user!.id, req.body.comments);
 
     res.status(200).json({
       success: true,
@@ -48,7 +48,7 @@ export class RequestController {
   });
 
   static rejectRequest = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.rejectRequest(req.params.id, req.user!.id, req.body.reason);
+    const request = await RequestService.rejectRequest(String(req.params["id"]), req.user!.id, req.body.reason);
 
     res.status(200).json({
       success: true,
@@ -58,7 +58,7 @@ export class RequestController {
   });
 
   static fulfillRequest = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.fulfillRequest(req.params.id, req.user!.id);
+    const request = await RequestService.fulfillRequest(String(req.params["id"]), req.user!.id);
 
     res.status(200).json({
       success: true,

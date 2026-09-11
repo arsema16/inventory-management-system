@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/errorHandler.js';
 import prisma from '../utils/prisma.js';
@@ -8,12 +8,15 @@ const router = express.Router();
 router.use(authenticate);
 router.use(authorize(UserRole.ADMIN));
 
-router.get('/', asyncHandler(async (req, res) => {
-  const { page = '1', limit = '50', entity, action } = req.query as Record<string, string>;
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
+  const page   = String(req.query['page']   ?? '1');
+  const limit  = String(req.query['limit']  ?? '50');
+  const entity = req.query['entity'] ? String(req.query['entity']) : undefined;
+  const action = req.query['action'] ? String(req.query['action']) : undefined;
 
-  const where: any = {};
-  if (entity) where.entity = entity;
-  if (action) where.action = action;
+  const where: Record<string, string> = {};
+  if (entity) where['entity'] = entity;
+  if (action) where['action'] = action;
 
   const skip = (parseInt(page) - 1) * parseInt(limit);
 

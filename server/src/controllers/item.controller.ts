@@ -20,7 +20,7 @@ export class ItemController {
   });
 
   static getItemById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const item = await ItemService.getItemById(req.params.id);
+    const item = await ItemService.getItemById(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -39,7 +39,7 @@ export class ItemController {
   });
 
   static updateItem = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const item = await ItemService.updateItem(req.params.id, req.body);
+    const item = await ItemService.updateItem(String(req.params["id"]), req.body);
 
     res.status(200).json({
       success: true,
@@ -49,7 +49,7 @@ export class ItemController {
   });
 
   static deleteItem = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await ItemService.deleteItem(req.params.id);
+    const result = await ItemService.deleteItem(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -69,7 +69,7 @@ export class ItemController {
   static restockItem = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { quantity } = req.body;
     const userId = (req as any).user.id;
-    const item = await ItemService.restockItem(req.params.id, quantity, userId);
+    const item = await ItemService.restockItem(String(req.params["id"]), quantity, userId);
 
     res.status(200).json({
       success: true,
@@ -79,7 +79,7 @@ export class ItemController {
   });
 
   static getStockMovements = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const movements = await ItemService.getStockMovements(req.params.id);
+    const movements = await ItemService.getStockMovements(String(req.params["id"]));
 
     res.status(200).json({
       success: true,

@@ -18,7 +18,7 @@ export class VehicleSaleController {
   });
 
   static getSaleById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const sale = await VehicleSaleService.getSaleById(req.params.id);
+    const sale = await VehicleSaleService.getSaleById(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -37,7 +37,7 @@ export class VehicleSaleController {
   });
 
   static approveSale = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const sale = await VehicleSaleService.approveSale(req.params.id, req.user!.id, req.body.comments);
+    const sale = await VehicleSaleService.approveSale(String(req.params["id"]), req.user!.id, req.body.comments);
 
     res.status(200).json({
       success: true,
@@ -47,7 +47,7 @@ export class VehicleSaleController {
   });
 
   static rejectSale = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const sale = await VehicleSaleService.rejectSale(req.params.id, req.user!.id, req.body.reason);
+    const sale = await VehicleSaleService.rejectSale(String(req.params["id"]), req.user!.id, req.body.reason);
 
     res.status(200).json({
       success: true,
@@ -57,7 +57,7 @@ export class VehicleSaleController {
   });
 
   static completeSale = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const sale = await VehicleSaleService.completeSale(req.params.id);
+    const sale = await VehicleSaleService.completeSale(String(req.params["id"]));
 
     res.status(200).json({
       success: true,

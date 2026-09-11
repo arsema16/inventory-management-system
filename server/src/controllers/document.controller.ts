@@ -7,7 +7,7 @@ import fs from 'fs';
 
 export class DocumentController {
   static uploadDocument = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { saleId } = req.params;
+    const saleId = String(req.params['saleId']);
     const { type } = req.body;
 
     if (!req.file) {
@@ -29,7 +29,7 @@ export class DocumentController {
 
   static getDocumentsBySale = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { saleId } = req.params;
+      const saleId = String(req.params['saleId']);
 
       const documents = await DocumentService.getDocumentsBySale(saleId);
 
@@ -42,7 +42,7 @@ export class DocumentController {
 
   static downloadDocument = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-      const { id } = req.params;
+      const id = String(req.params['id']);
 
       const document = await DocumentService.getDocumentById(id);
 
@@ -57,7 +57,7 @@ export class DocumentController {
   );
 
   static deleteDocument = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
+    const id = String(req.params['id']);
 
     const result = await DocumentService.deleteDocument(id);
 

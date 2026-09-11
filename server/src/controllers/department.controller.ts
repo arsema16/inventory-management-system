@@ -13,7 +13,7 @@ export class DepartmentController {
   });
 
   static getDepartmentById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const department = await DepartmentService.getDepartmentById(req.params.id);
+    const department = await DepartmentService.getDepartmentById(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
@@ -32,7 +32,7 @@ export class DepartmentController {
   });
 
   static updateDepartment = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const department = await DepartmentService.updateDepartment(req.params.id, req.body.name);
+    const department = await DepartmentService.updateDepartment(String(req.params["id"]), req.body.name);
 
     res.status(200).json({
       success: true,
@@ -42,7 +42,7 @@ export class DepartmentController {
   });
 
   static deleteDepartment = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const result = await DepartmentService.deleteDepartment(req.params.id);
+    const result = await DepartmentService.deleteDepartment(String(req.params["id"]));
 
     res.status(200).json({
       success: true,
