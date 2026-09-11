@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+uploads/
+*.log
+.DS_Store
+# Do NOT ignore prisma/migrations — needed for Railway deploy

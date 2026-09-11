@@ -1,122 +1,111 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardLayout from './layouts/DashboardLayout';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Unauthorized from './pages/Unauthorized';
+
+// Inventory
+import InventoryList from './pages/Inventory/InventoryList';
+import InventoryForm from './pages/Inventory/InventoryForm';
+import InventoryDetail from './pages/Inventory/InventoryDetail';
+
+// Vehicles
+import VehicleList from './pages/Vehicles/VehicleList';
+import VehicleForm from './pages/Vehicles/VehicleForm';
+
+// Requests
+import RequestList from './pages/Requests/RequestList';
+import RequestForm from './pages/Requests/RequestForm';
+import RequestDetail from './pages/Requests/RequestDetail';
+
+// Vehicle Sales
+import SalesList from './pages/Sales/SalesList';
+import SaleForm from './pages/Sales/SaleForm';
+import SaleDetail from './pages/Sales/SaleDetail';
+
+// Approvals
+import ApprovalCenter from './pages/Approvals/ApprovalCenter';
+
+// Users & Departments
+import UserList from './pages/Users/UserList';
+import UserForm from './pages/Users/UserForm';
+import DepartmentList from './pages/Departments/DepartmentList';
+import DepartmentForm from './pages/Departments/DepartmentForm';
+
+// Reports & Audit
+import ReportsList from './pages/Reports/ReportsList';
+import AuditLogs from './pages/Audit/AuditLogs';
+import StockManagement from './pages/Stock/StockManagement';
+import NotificationsPage from './pages/Notifications/NotificationsPage';
+
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Router>
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-      <div className="ticks"></div>
+          {/* Protected Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            
+            {/* Inventory */}
+            <Route path="inventory" element={<InventoryList />} />
+            <Route path="inventory/new" element={<InventoryForm />} />
+            <Route path="inventory/:id" element={<InventoryDetail />} />
+            <Route path="inventory/edit/:id" element={<InventoryForm />} />
+            
+            {/* Vehicles */}
+            <Route path="vehicles" element={<VehicleList />} />
+            <Route path="vehicles/new" element={<VehicleForm />} />
+            <Route path="vehicles/edit/:id" element={<VehicleForm />} />
+            
+            {/* Requests */}
+            <Route path="requests" element={<RequestList />} />
+            <Route path="requests/new" element={<RequestForm />} />
+            <Route path="requests/:id" element={<RequestDetail />} />
+            
+            {/* Vehicle Sales */}
+            <Route path="sales" element={<SalesList />} />
+            <Route path="sales/new" element={<SaleForm />} />
+            <Route path="sales/:id" element={<SaleDetail />} />
+            
+            {/* Approvals */}
+            <Route path="approvals" element={<ApprovalCenter />} />
+            
+            {/* Users & Management */}
+            <Route path="users" element={<UserList />} />
+            <Route path="users/new" element={<UserForm />} />
+            <Route path="users/edit/:id" element={<UserForm />} />
+            <Route path="departments" element={<DepartmentList />} />
+            <Route path="departments/new" element={<DepartmentForm />} />
+            <Route path="departments/edit/:id" element={<DepartmentForm />} />
+            <Route path="reports" element={<ReportsList />} />
+            <Route path="audit" element={<AuditLogs />} />
+            <Route path="stock" element={<StockManagement />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+          </Route>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
 }
 
-export default App
+export default App;

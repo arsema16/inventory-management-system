@@ -1,0 +1,413 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  EMPLOYEE
+  OPERATIONS_MANAGER
+  STOREKEEPER
+  FINANCE
+  PROCUREMENT
+  ADMIN
+}
+
+enum ItemType {
+  GENERAL
+  VEHICLE
+}
+
+enum ItemStatus {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
+  RESERVED
+  SOLD
+  DAMAGED
+  INACTIVE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  PARTIALLY_APPROVED
+  REJECTED
+  FULFILLED
+  CANCELLED
+}
+
+enum RequestType {
+  INVENTORY
+  VEHICLE
+  PROCUREMENT
+  OTHER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RETURN
+  SALE
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  MAINTENANCE
+  INACTIVE
+}
+
+enum SaleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum DocumentType {
+  SALES_AGREEMENT
+  PAYMENT_RECEIPT
+  CLIENT_ID
+  OWNERSHIP_DOCUMENT
+  TAX_DOCUMENT
+  OTHER
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+enum NotificationType {
+  REQUEST
+  APPROVAL
+  REJECTION
+  INVENTORY
+  PROCUREMENT
+  VEHICLE_SALE
+  DOCUMENT
+  SYSTEM
+}
+
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@map("departments")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  departmentId String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department        Department?     @relation(fields: [departmentId], references: [id])
+  requests          Request[]
+  approvals         Approval[]
+  stockMovements    StockMovement[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  submittedSales    VehicleSale[]   @relation("SaleSubmittedBy")
+  uploadedDocuments Document[]      @relation("DocumentUploadedBy")
+  purchaseOrders    PurchaseOrder[]
+
+  @@index([departmentId])
+  @@index([role])
+  @@map("users")
+}
+
+model Item {
+  id          String     @id @default(uuid())
+  name        String
+  sku         String     @unique
+  description String?
+  type        ItemType   @default(GENERAL)
+  unit        String     @default("piece")
+  quantity    Int        @default(0)
+  minimumQty  Int        @default(0)
+  status      ItemStatus @default(AVAILABLE)
+  location    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  vehicle        Vehicle?
+  requestItems   RequestItem[]
+  stockMovements StockMovement[]
+  purchaseItems  PurchaseOrderItem[]
+
+  @@index([type])
+  @@index([status])
+  @@map("items")
+}
+
+model Vehicle {
+  id          String        @id @default(uuid())
+  itemId      String        @unique
+  vehicleId   String        @unique
+  vin         String?       @unique
+  plateNumber String?       @unique
+  make        String
+  model       String
+  year        Int?
+  batteryInfo String?
+  mileage     Int?
+  status      VehicleStatus @default(AVAILABLE)
+  salePrice   Decimal?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  item  Item          @relation(fields: [itemId], references: [id])
+  sales VehicleSale[]
+
+  @@index([status])
+  @@map("vehicles")
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  phone     String?
+  email     String?
+  address   String?
+  idNumber  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicleSales VehicleSale[]
+
+  @@map("clients")
+}
+
+model Request {
+  id              String        @id @default(uuid())
+  requestNumber   String        @unique
+  type            RequestType
+  status          RequestStatus @default(PENDING)
+  reason          String?
+  rejectionReason String?
+  requestedById   String
+  approvedAt      DateTime?
+  fulfilledAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  requestedBy User          @relation(fields: [requestedById], references: [id])
+  items       RequestItem[]
+  approvals   Approval[]
+
+  @@index([requestedById])
+  @@index([status])
+  @@index([type])
+  @@map("requests")
+}
+
+model RequestItem {
+  id          String  @id @default(uuid())
+  requestId   String
+  itemId      String
+  quantity    Int
+  approvedQty Int?
+  issuedQty   Int     @default(0)
+  notes       String?
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  item    Item    @relation(fields: [itemId], references: [id])
+
+  @@unique([requestId, itemId])
+  @@map("request_items")
+}
+
+model Approval {
+  id              String         @id @default(uuid())
+  requestId       String?
+  saleId          String?
+  purchaseOrderId String?
+  approvedById    String
+  status          ApprovalStatus @default(PENDING)
+  comments        String?
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  request       Request?       @relation(fields: [requestId], references: [id])
+  sale          VehicleSale?   @relation(fields: [saleId], references: [id])
+  purchaseOrder PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+  approvedBy    User           @relation(fields: [approvedById], references: [id])
+
+  @@index([status])
+  @@index([approvedById])
+  @@map("approvals")
+}
+
+model StockMovement {
+  id          String            @id @default(uuid())
+  itemId      String
+  userId      String
+  type        StockMovementType
+  quantity    Int
+  previousQty Int
+  newQty      Int
+  reference   String?
+  notes       String?
+  createdAt   DateTime          @default(now())
+
+  item Item @relation(fields: [itemId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([itemId])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
+
+model VehicleSale {
+  id               String     @id @default(uuid())
+  saleNumber       String     @unique
+  vehicleId        String
+  clientId         String
+  submittedById    String
+  salePrice        Decimal
+  paymentReference String?
+  status           SaleStatus @default(PENDING)
+  notes            String?
+  approvedAt       DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  vehicle     Vehicle    @relation(fields: [vehicleId], references: [id])
+  client      Client     @relation(fields: [clientId], references: [id])
+  submittedBy User       @relation("SaleSubmittedBy", fields: [submittedById], references: [id])
+  documents   Document[]
+  approvals   Approval[]
+
+  @@index([vehicleId])
+  @@index([clientId])
+  @@index([status])
+  @@map("vehicle_sales")
+}
+
+model Document {
+  id           String       @id @default(uuid())
+  saleId       String
+  type         DocumentType
+  fileName     String
+  fileUrl      String
+  uploadedById String
+  createdAt    DateTime     @default(now())
+
+  sale       VehicleSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  uploadedBy User        @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([saleId])
+  @@map("documents")
+}
+
+model Supplier {
+  id          String   @id @default(uuid())
+  name        String
+  contactName String?
+  phone       String?
+  email       String?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model PurchaseOrder {
+  id          String              @id @default(uuid())
+  orderNumber String              @unique
+  supplierId  String
+  createdById String
+  status      PurchaseOrderStatus @default(PENDING)
+  totalAmount Decimal?
+  orderedAt   DateTime?
+  receivedAt  DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  supplier  Supplier            @relation(fields: [supplierId], references: [id])
+  createdBy User                @relation(fields: [createdById], references: [id])
+  items     PurchaseOrderItem[]
+  approvals Approval[]
+
+  @@index([supplierId])
+  @@index([status])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(uuid())
+  purchaseOrderId String
+  itemId          String
+  quantity        Int
+  unitPrice       Decimal
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  item          Item          @relation(fields: [itemId], references: [id])
+
+  @@unique([purchaseOrderId, itemId])
+  @@map("purchase_order_items")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  details   Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
