@@ -7,7 +7,7 @@ import Button from '../../components/Button';
 import SearchInput from '../../components/SearchInput';
 import Select from '../../components/Select';
 import Badge from '../../components/Badge';
-import { formatCurrency, formatDate, getStatusColor, formatStatus } from '../../utils/formatters';
+import { formatCurrency, getStatusColor, formatStatus } from '../../utils/formatters';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuth } from '../../contexts/AuthContext';
 import { USER_ROLES } from '../../config/constants';

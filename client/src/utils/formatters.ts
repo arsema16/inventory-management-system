@@ -68,8 +68,8 @@ export const formatEthiopianPhone = (phone: string): string => {
 };
 
 // Status formatting
-export const getStatusColor = (status: string): string => {
-  const statusColors: Record<string, string> = {
+export const getStatusColor = (status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
+  const statusColors: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
     PENDING: 'warning',
     APPROVED: 'success',
     REJECTED: 'danger',

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../utils/api';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency } from '../../utils/formatters';
 
 /* ─── Types ─── */
 interface RequestItem { status: string; type: string; createdAt: string; fulfilledAt?: string; requestedBy: { department?: { name: string } } }

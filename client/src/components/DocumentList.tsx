@@ -1,7 +1,7 @@
 import { Document } from '../types';
 import Badge from './Badge';
 import Button from './Button';
-import { formatDateTime, formatFileSize, formatStatus } from '../utils/formatters';
+import { formatDateTime, formatStatus } from '../utils/formatters';
 
 interface DocumentListProps {
   documents: Document[];
